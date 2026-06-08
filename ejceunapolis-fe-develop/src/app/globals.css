@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 39% 5%;
+    --foreground: 213 31% 98%;
+    --card: 222 38% 10%;
+    --card-foreground: 213 31% 98%;
+    --popover: 222 38% 10%;
+    --popover-foreground: 213 31% 98%;
+    --primary: 252 100% 68%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 37% 12%;
+    --secondary-foreground: 213 20% 80%;
+    --muted: 222 37% 12%;
+    --muted-foreground: 215 17% 50%;
+    --accent: 222 36% 14%;
+    --accent-foreground: 213 31% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 29% 18%;
+    --input: 223 39% 7%;
+    --ring: 252 100% 68%;
+    --chart-1: 252 100% 68%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 43 90% 64%;
+    --chart-4: 142 71% 45%;
+    --chart-5: 0 72% 51%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-[#080B12] text-slate-50 font-sans antialiased;
+  }
+}
+
+/* Scrollbar dark */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080B12;
+}
+::-webkit-scrollbar-thumb {
+  background: #7C5CFF;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8B6DFF;
+}
+
+/* Select dark override */
+select option {
+  background-color: #101624;
+  color: #f8fafc;
+}
+
+/* Fix browser autofill dark background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #0B0F19 inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  caret-color: #f8fafc;
+}
