@@ -331,10 +331,10 @@ export default function TeamsPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-200">{m.nomeCompleto}</span>
                           {m.coordenador && (
-                            <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" title="Coordenador" />
+                            <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                           )}
                           {m.veterano && (
-                            <Star className="w-3.5 h-3.5 text-amber-500/70 shrink-0" title="Veterano" />
+                            <Star className="w-3.5 h-3.5 text-amber-500/70 shrink-0" />
                           )}
                         </div>
                         <p className="text-xs text-slate-600 mt-0.5 sm:hidden">{m.whatsapp}</p>
