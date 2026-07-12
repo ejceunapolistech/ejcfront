@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import logo from "@/app/assets/img/logo-2025.png";
@@ -284,6 +284,35 @@ export default function EncounterForm() {
   >([]);
   const [dadosMaisRecentesGlobal, setDadosMaisRecentesGlobal] =
     useState<DadosMaisRecentes | null>(null);
+
+  // Equipe config state (ativa/inativa)
+  const [equipeConfigs, setEquipeConfigs] = useState<
+    { nomeEquipe: string; tipoEquipe: string; ativa: boolean }[]
+  >([]);
+
+  useEffect(() => {
+    if (!idEvento) return;
+    axios
+      .get(`${API_BASE_URL}/ejceunapolis/api/equipe/config/${idEvento}`)
+      .then((r) => setEquipeConfigs(r.data))
+      .catch(() => setEquipeConfigs([]));
+  }, [idEvento]);
+
+  const isEquipeAtiva = (nomeEquipe: string, tipoEquipe: string) => {
+    const cfg = equipeConfigs.find(
+      (c) => c.nomeEquipe === nomeEquipe && c.tipoEquipe === tipoEquipe
+    );
+    return cfg ? cfg.ativa : true;
+  };
+
+  const equipeFrenteOptions = useMemo(
+    () => EQUIPE_FRENTE_OPTIONS.filter((o) => isEquipeAtiva(o.value, "FRENTE")),
+    [equipeConfigs]
+  );
+  const equipeFundoOptions = useMemo(
+    () => EQUIPE_FUNDO_OPTIONS.filter((o) => isEquipeAtiva(o.value, "FUNDO")),
+    [equipeConfigs]
+  );
 
   // Form state
   const [formData, setFormData] = useState<FormData>({
@@ -856,7 +885,7 @@ export default function EncounterForm() {
                           id="equipeFrente1"
                           value={formData.equipeFrente1}
                           onChange={(v) => set("equipeFrente1", v)}
-                          options={EQUIPE_FRENTE_OPTIONS}
+                          options={equipeFrenteOptions}
                           placeholder="Selecione..."
                         />
                       </FormField>
@@ -865,7 +894,7 @@ export default function EncounterForm() {
                           id="equipeFrente2"
                           value={formData.equipeFrente2}
                           onChange={(v) => set("equipeFrente2", v)}
-                          options={EQUIPE_FRENTE_OPTIONS}
+                          options={equipeFrenteOptions}
                           placeholder="Selecione..."
                         />
                       </FormField>
@@ -883,7 +912,7 @@ export default function EncounterForm() {
                           id="equipeFundo1"
                           value={formData.equipeFundo1}
                           onChange={(v) => set("equipeFundo1", v)}
-                          options={EQUIPE_FUNDO_OPTIONS}
+                          options={equipeFundoOptions}
                           placeholder="Selecione..."
                         />
                       </FormField>
@@ -892,7 +921,7 @@ export default function EncounterForm() {
                           id="equipeFundo2"
                           value={formData.equipeFundo2}
                           onChange={(v) => set("equipeFundo2", v)}
-                          options={EQUIPE_FUNDO_OPTIONS}
+                          options={equipeFundoOptions}
                           placeholder="Selecione..."
                         />
                       </FormField>
