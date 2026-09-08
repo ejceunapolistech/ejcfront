@@ -22,9 +22,9 @@ const EQUIPES_FRENTE = [
   { value: "BANDINHA",    label: "Bandinha" },
   { value: "BOA_VONTADE", label: "Boa Vontade" },
   { value: "BISCOITO",    label: "Biscoito" },
+  { value: "RECEPCAO",    label: "Recepção" },
   { value: "SOCIODRAMA",  label: "Sociodrama" },
   { value: "TRANSITO",    label: "Trânsito" },
-  { value: "NAO_OPTAR",   label: "Não Optar" },
   { value: "GARCONS",     label: "Garçons" },
 ];
 
@@ -32,7 +32,6 @@ const EQUIPES_FUNDO = [
   { value: "ORACAO",      label: "Oração" },
   { value: "ORDERM",      label: "Ordem" },
   { value: "MIDIA",       label: "Mídia" },
-  { value: "RECEPCAO",    label: "Recepção" },
   { value: "COZINHA",     label: "Cozinha" },
   { value: "CIRCULO",     label: "Círculo" },
   { value: "SECRETARIA",  label: "Secretaria" },
@@ -40,7 +39,6 @@ const EQUIPES_FUNDO = [
   { value: "CERIMONIAL",  label: "Cerimonial" },
   { value: "ROTEIRO",     label: "Roteiro" },
   { value: "REFEITORIO",  label: "Refeitório" },
-  { value: "NAO_OPTAR",   label: "Não Optar (Fundo)" },
 ];
 
 const ALL_EQUIPES = [
@@ -89,7 +87,12 @@ export default function TeamsPage() {
   const [moverFundo1, setMoverFundo1] = useState("");
   const [moverFundo2, setMoverFundo2] = useState("");
   const [savingMover, setSavingMover] = useState(false);
+  const [moverError, setMoverError] = useState("");
   const [togglingCoord, setTogglingCoord] = useState<string | null>(null);
+
+  const moverTeams = [moverFrente1, moverFrente2, moverFundo1, moverFundo2];
+  const moverSelectionValid =
+    moverTeams.every(Boolean) && new Set(moverTeams).size === moverTeams.length;
 
   const carregarConfigs = () => {
     if (!idEvento) return;
@@ -165,22 +168,33 @@ export default function TeamsPage() {
     setMoverFrente2("");
     setMoverFundo1("");
     setMoverFundo2("");
+    setMoverError("");
   };
 
   const salvarMover = async () => {
     if (!moverOpen) return;
+    if (!moverSelectionValid) {
+      setMoverError("Selecione quatro equipes diferentes.");
+      return;
+    }
+    setMoverError("");
     setSavingMover(true);
     try {
       await axios.patch(`${API_BASE_URL}/ejceunapolis/api/equipe/mover/${moverOpen.idEncontreiro}`, {
-        equipeFrente1: moverFrente1 || null,
-        equipeFrente2: moverFrente2 || null,
-        equipeFundo1: moverFundo1 || null,
-        equipeFundo2: moverFundo2 || null,
+        equipeFrente1: moverFrente1,
+        equipeFrente2: moverFrente2,
+        equipeFundo1: moverFundo1,
+        equipeFundo2: moverFundo2,
       });
       setMoverOpen(null);
       if (selected) await carregarMembros(selected.value, selected.tipo);
     } catch (e) {
       console.error(e);
+      if (axios.isAxiosError(e)) {
+        setMoverError(e.response?.data?.message || "Não foi possível alterar as equipes.");
+      } else {
+        setMoverError("Não foi possível alterar as equipes.");
+      }
     } finally {
       setSavingMover(false);
     }
@@ -445,7 +459,7 @@ export default function TeamsPage() {
           <DialogHeader>
             <DialogTitle>Mover {moverOpen?.nomeCompleto}</DialogTitle>
           </DialogHeader>
-          <p className="text-xs text-slate-500 -mt-2">Selecione as novas equipes. Deixe em branco para remover.</p>
+          <p className="text-xs text-slate-500 -mt-2">Selecione quatro equipes diferentes.</p>
           <div className="space-y-3 mt-3">
             {([
               { label: "Frente — 1ª opção", value: moverFrente1, set: setMoverFrente1, opts: EQUIPES_FRENTE },
@@ -455,20 +469,28 @@ export default function TeamsPage() {
             ] as const).map(({ label, value, set, opts }) => (
               <div key={label} className="space-y-1.5">
                 <label className="text-xs text-slate-400">{label}</label>
-                <Select value={value || "_none"} onValueChange={(v) => set(v === "_none" ? "" : v)}>
+                <Select value={value} onValueChange={set}>
                   <SelectTrigger className="h-9 text-sm bg-[#0B0F19] border-[#20293A]">
                     <SelectValue placeholder="Não optar" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="_none"><span className="text-slate-500">— Nenhuma —</span></SelectItem>
                     {opts.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      <SelectItem
+                        key={o.value}
+                        value={o.value}
+                        disabled={moverTeams.includes(o.value) && o.value !== value}
+                      >
+                        {o.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
             ))}
           </div>
+          {moverError && (
+            <p className="text-sm text-rose-400">{moverError}</p>
+          )}
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setMoverOpen(null)}>Cancelar</Button>
             <Button onClick={salvarMover} disabled={savingMover} className="bg-[#7C5CFF] hover:bg-[#8B6DFF] text-white">

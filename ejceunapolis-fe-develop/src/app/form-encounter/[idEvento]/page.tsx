@@ -26,9 +26,9 @@ const EQUIPE_FRENTE_OPTIONS = [
   { value: "BANDINHA",    label: "Bandinha" },
   { value: "BOA_VONTADE", label: "Boa Vontade" },
   { value: "BISCOITO",    label: "Biscoito" },
+  { value: "RECEPCAO",    label: "Recepção" },
   { value: "SOCIODRAMA",  label: "Sociodrama" },
   { value: "TRANSITO",    label: "Trânsito" },
-  { value: "NAO_OPTAR",   label: "Não Optar" },
   { value: "GARCONS",     label: "Garçons" },
 ];
 
@@ -36,7 +36,6 @@ const EQUIPE_FUNDO_OPTIONS = [
   { value: "ORACAO",      label: "Oração" },
   { value: "ORDERM",      label: "Ordem" },
   { value: "MIDIA",       label: "Mídia" },
-  { value: "RECEPCAO",    label: "Recepção" },
   { value: "COZINHA",     label: "Cozinha" },
   { value: "CIRCULO",     label: "Círculo" },
   { value: "SECRETARIA",  label: "Secretaria" },
@@ -44,16 +43,15 @@ const EQUIPE_FUNDO_OPTIONS = [
   { value: "CERIMONIAL",  label: "Cerimonial" },
   { value: "ROTEIRO",     label: "Roteiro" },
   { value: "REFEITORIO",  label: "Refeitório" },
-  { value: "NAO_OPTAR",   label: "Não Optar" },
 ];
 
 const FRENTE_LABEL_TO_VALUE: Record<string, string> = {
   "Bandinha":   "BANDINHA",
   "Boa Vontade": "BOA_VONTADE",
   "Biscoito":   "BISCOITO",
+  "Recepção":   "RECEPCAO",
   "Sociodrama": "SOCIODRAMA",
   "Trânsito":   "TRANSITO",
-  "Não Optar":  "NAO_OPTAR",
   "Garçons":    "GARCONS",
 };
 
@@ -61,7 +59,6 @@ const FUNDO_LABEL_TO_VALUE: Record<string, string> = {
   "Oração":    "ORACAO",
   "Ordem":      "ORDERM",
   "Mídia":      "MIDIA",
-  "Recepção":  "RECEPCAO",
   "Cozinha":    "COZINHA",
   "Círculo":    "CIRCULO",
   "Secretaria": "SECRETARIA",
@@ -69,8 +66,13 @@ const FUNDO_LABEL_TO_VALUE: Record<string, string> = {
   "Cerimonial": "CERIMONIAL",
   "Roteiro":    "ROTEIRO",
   "Refeitório": "REFEITORIO",
-  "Não Optar":  "NAO_OPTAR",
 };
+
+const normalizeFrenteSelection = (label: string | null) =>
+  label ? (FRENTE_LABEL_TO_VALUE[label] ?? "") : "";
+
+const normalizeFundoSelection = (label: string | null) =>
+  label ? (FUNDO_LABEL_TO_VALUE[label] ?? "") : "";
 // ---------------------------------------------------------------------------
 // Interfaces
 // ---------------------------------------------------------------------------
@@ -172,12 +174,14 @@ function SelectField({
   onChange,
   options,
   placeholder,
+  selectedValues,
 }: {
   id: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
   placeholder: string;
+  selectedValues: string[];
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
@@ -191,7 +195,11 @@ function SelectField({
           const info = getTeamInfo(o.value);
           const Icon = info?.icon;
           return (
-            <SelectItem key={o.value} value={o.value}>
+            <SelectItem
+              key={o.value}
+              value={o.value}
+              disabled={selectedValues.includes(o.value) && o.value !== value}
+            >
               <span className="inline-flex items-center gap-2">
                 {Icon && <Icon size={14} className="opacity-75 shrink-0" />}
                 {o.label}
@@ -362,18 +370,10 @@ export default function EncounterForm() {
       cidade:       dados.cidade       ?? prev.cidade,
       estado:       dados.estado       ?? prev.estado,
       religiao:     dados.religiao     ?? prev.religiao,
-      equipeFrente1: dados.equipeFrente1
-        ? (FRENTE_LABEL_TO_VALUE[dados.equipeFrente1] ?? "")
-        : "",
-      equipeFrente2: dados.equipeFrente2
-        ? (FRENTE_LABEL_TO_VALUE[dados.equipeFrente2] ?? "")
-        : "",
-      equipeFundo1: dados.equipeFundo1
-        ? (FUNDO_LABEL_TO_VALUE[dados.equipeFundo1] ?? "")
-        : "",
-      equipeFundo2: dados.equipeFundo2
-        ? (FUNDO_LABEL_TO_VALUE[dados.equipeFundo2] ?? "")
-        : "",
+      equipeFrente1: normalizeFrenteSelection(dados.equipeFrente1),
+      equipeFrente2: normalizeFrenteSelection(dados.equipeFrente2),
+      equipeFundo1: normalizeFundoSelection(dados.equipeFundo1),
+      equipeFundo2: normalizeFundoSelection(dados.equipeFundo2),
     }));
   };
   const handleSearchHistory = async () => {
@@ -415,18 +415,10 @@ export default function EncounterForm() {
   const handleSelectHistorico = (item: HistoricoItem) => {
     setFormData((prev) => ({
       ...prev,
-      equipeFrente1: item.equipeFrente1
-        ? (FRENTE_LABEL_TO_VALUE[item.equipeFrente1] ?? "")
-        : "",
-      equipeFrente2: item.equipeFrente2
-        ? (FRENTE_LABEL_TO_VALUE[item.equipeFrente2] ?? "")
-        : "",
-      equipeFundo1: item.equipeFundo1
-        ? (FUNDO_LABEL_TO_VALUE[item.equipeFundo1] ?? "")
-        : "",
-      equipeFundo2: item.equipeFundo2
-        ? (FUNDO_LABEL_TO_VALUE[item.equipeFundo2] ?? "")
-        : "",
+      equipeFrente1: normalizeFrenteSelection(item.equipeFrente1),
+      equipeFrente2: normalizeFrenteSelection(item.equipeFrente2),
+      equipeFundo1: normalizeFundoSelection(item.equipeFundo1),
+      equipeFundo2: normalizeFundoSelection(item.equipeFundo2),
     }));
     setScreen("form");
   };
@@ -448,8 +440,15 @@ export default function EncounterForm() {
     formData.bairro.trim() !== "" &&
     formData.estado.trim() !== "";
 
-  const isStep3Valid =
-    formData.equipeFundo1 !== "" && formData.equipeFundo2 !== "";
+  const selectedTeams = [
+    formData.equipeFrente1,
+    formData.equipeFrente2,
+    formData.equipeFundo1,
+    formData.equipeFundo2,
+  ];
+  const allTeamsSelected = selectedTeams.every(Boolean);
+  const teamsAreDistinct = new Set(selectedTeams).size === selectedTeams.length;
+  const isStep3Valid = allTeamsSelected && teamsAreDistinct;
 
   const canAdvance =
     (step === 1 && isStep1Valid) ||
@@ -870,31 +869,33 @@ export default function EncounterForm() {
                       Preferência de Equipes
                     </h2>
                     <p className="text-sm text-slate-500">
-                      Escolha suas preferências. As equipes de frente são opcionais.
+                      Escolha quatro equipes diferentes: duas de frente e duas de fundo.
                     </p>
                   </div>
 
                   {/* Frente */}
                   <div className="rounded-xl border border-[#6D3DF2]/30 bg-[#6D3DF2]/5 p-4 space-y-4">
                     <p className="text-xs font-semibold text-[#A78BFA] uppercase tracking-wide">
-                      Equipe de Frente <span className="text-slate-500 normal-case font-normal">(opcional)</span>
+                      Equipe de Frente <span className="text-rose-500">*</span>
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormField label="1ª opção">
+                      <FormField label="1ª opção" required>
                         <SelectField
                           id="equipeFrente1"
                           value={formData.equipeFrente1}
                           onChange={(v) => set("equipeFrente1", v)}
                           options={equipeFrenteOptions}
+                          selectedValues={selectedTeams}
                           placeholder="Selecione..."
                         />
                       </FormField>
-                      <FormField label="2ª opção">
+                      <FormField label="2ª opção" required>
                         <SelectField
                           id="equipeFrente2"
                           value={formData.equipeFrente2}
                           onChange={(v) => set("equipeFrente2", v)}
                           options={equipeFrenteOptions}
+                          selectedValues={selectedTeams}
                           placeholder="Selecione..."
                         />
                       </FormField>
@@ -913,6 +914,7 @@ export default function EncounterForm() {
                           value={formData.equipeFundo1}
                           onChange={(v) => set("equipeFundo1", v)}
                           options={equipeFundoOptions}
+                          selectedValues={selectedTeams}
                           placeholder="Selecione..."
                         />
                       </FormField>
@@ -922,6 +924,7 @@ export default function EncounterForm() {
                           value={formData.equipeFundo2}
                           onChange={(v) => set("equipeFundo2", v)}
                           options={equipeFundoOptions}
+                          selectedValues={selectedTeams}
                           placeholder="Selecione..."
                         />
                       </FormField>

@@ -14,8 +14,8 @@ import {
 import TeamLabel from "@/components/team/team-label"
 import { getTeamInfo } from "@/constants/team-icons"
 
-const EQUIPE_FRENTE = ["Bandinha", "Boa Vontade", "Biscoito", "Sociodrama", "Trânsito", "Não Optar", "Garçons"];
-const EQUIPE_FUNDO = ["Oração", "Ordem", "Mídia", "Recepção", "Cozinha", "Círculo", "Secretaria", "Apoio", "Cerimonial", "Roteiro", "Refeitório", "Não Optar"];
+const EQUIPE_FRENTE = ["Bandinha", "Boa Vontade", "Biscoito", "Recepção", "Sociodrama", "Trânsito", "Garçons"];
+const EQUIPE_FUNDO = ["Oração", "Ordem", "Mídia", "Cozinha", "Círculo", "Secretaria", "Apoio", "Cerimonial", "Roteiro", "Refeitório"];
 const STATUS_OPTIONS = ["Aprovado", "Pendente", "NÃO PAGO"];
 
 export default function DemoPage() {

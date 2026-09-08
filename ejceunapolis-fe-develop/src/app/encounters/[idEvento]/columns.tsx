@@ -13,8 +13,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-const equipeFundoOptions = ["ORACAO","ORDERM","MÍDIA","RECEPÇÃO","COZINHA","CÍRCULO","SECRETARIA","APOIO","CERIMONIAL","ROTEIRO","NAO_OPTAR"];
-const equipeFrenteOptions = ["BOA_VONTADE","BANDINHA","BISCOITO","SOCIODRAMA","TRANSITO","GARCONS","NAO_OPTAR"];
+const equipeFundoOptions = ["ORACAO","ORDERM","MIDIA","COZINHA","CIRCULO","SECRETARIA","APOIO","CERIMONIAL","ROTEIRO","REFEITORIO"];
+const equipeFrenteOptions = ["BOA_VONTADE","BANDINHA","BISCOITO","RECEPCAO","SOCIODRAMA","TRANSITO","GARCONS"];
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // ─── Tipo ────────────────────────────────────────────────────────────────────
@@ -40,6 +40,37 @@ export type Encounters = {
   idPagamentoMp: string;
   veterano: boolean;
 };
+
+const TEAM_LABEL_TO_VALUE: Record<string, string> = {
+  "Bandinha": "BANDINHA",
+  "Boa Vontade": "BOA_VONTADE",
+  "Biscoito": "BISCOITO",
+  "Recepção": "RECEPCAO",
+  "Sociodrama": "SOCIODRAMA",
+  "Trânsito": "TRANSITO",
+  "Garçons": "GARCONS",
+  "Oração": "ORACAO",
+  "Ordem": "ORDERM",
+  "Mídia": "MIDIA",
+  "Cozinha": "COZINHA",
+  "Círculo": "CIRCULO",
+  "Secretaria": "SECRETARIA",
+  "Apoio": "APOIO",
+  "Cerimonial": "CERIMONIAL",
+  "Roteiro": "ROTEIRO",
+  "Refeitório": "REFEITORIO",
+  "Não Optar": "NAO_OPTAR",
+};
+
+const normalizeTeamValue = (value: string) => TEAM_LABEL_TO_VALUE[value] ?? value;
+
+const normalizeEncounterTeams = (encounter: Encounters): Encounters => ({
+  ...encounter,
+  equipeFrente1: normalizeTeamValue(encounter.equipeFrente1),
+  equipeFrente2: normalizeTeamValue(encounter.equipeFrente2),
+  equipeFundo1: normalizeTeamValue(encounter.equipeFundo1),
+  equipeFundo2: normalizeTeamValue(encounter.equipeFundo2),
+});
 
 // ─── Helpers de UI ────────────────────────────────────────────────────────────
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -230,15 +261,39 @@ const DeleteEncounter = ({ encounter }: { encounter: Encounters }) => {
 export const EditEncounter = ({ encounter }: { encounter: Encounters }) => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"edit" | "info">("edit");
-  const [formData, setFormData] = useState({ ...encounter });
+  const [formData, setFormData] = useState(() => normalizeEncounterTeams(encounter));
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
-  useEffect(() => { setFormData({ ...encounter }); }, [encounter]);
+  useEffect(() => {
+    setFormData(normalizeEncounterTeams(encounter));
+    setSaveError("");
+  }, [encounter]);
 
-  const set = (field: keyof Encounters, value: string) =>
+  const set = (field: keyof Encounters, value: string) => {
+    setSaveError("");
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const selectedTeams = [
+    formData.equipeFrente1,
+    formData.equipeFrente2,
+    formData.equipeFundo1,
+    formData.equipeFundo2,
+  ];
+  const teamSelectionValid =
+    selectedTeams.every(Boolean) &&
+    new Set(selectedTeams).size === selectedTeams.length &&
+    !formData.equipeFundo1.includes("RECEP") &&
+    !formData.equipeFundo2.includes("RECEP") &&
+    !selectedTeams.includes("NAO_OPTAR");
 
   const handleSave = async () => {
+    if (!teamSelectionValid) {
+      setSaveError("Selecione quatro equipes diferentes. Recepção deve ser uma equipe de frente.");
+      return;
+    }
+    setSaveError("");
     setSaving(true);
     try {
       await axios.put(
@@ -250,6 +305,11 @@ export const EditEncounter = ({ encounter }: { encounter: Encounters }) => {
       window.location.reload();
     } catch (error) {
       console.error("Erro ao atualizar encontreiro:", error);
+      if (axios.isAxiosError(error)) {
+        setSaveError(error.response?.data?.message || "Não foi possível atualizar o encontreiro.");
+      } else {
+        setSaveError("Não foi possível atualizar o encontreiro.");
+      }
     } finally {
       setSaving(false);
     }
@@ -353,7 +413,11 @@ export const EditEncounter = ({ encounter }: { encounter: Encounters }) => {
                             const info = getTeamInfo(option);
                             const Icon = info?.icon;
                             return (
-                              <SelectItem key={option} value={option}>
+                              <SelectItem
+                                key={option}
+                                value={option}
+                                disabled={selectedTeams.includes(option) && formData[name] !== option}
+                              >
                                 <span className="inline-flex items-center gap-2">
                                   {Icon && <Icon size={14} className="opacity-75 shrink-0" />}
                                   {info?.label ?? option}
@@ -367,6 +431,9 @@ export const EditEncounter = ({ encounter }: { encounter: Encounters }) => {
                   ))}
                 </div>
               </Section>
+              {saveError && (
+                <p className="text-sm text-rose-400">{saveError}</p>
+              )}
             </div>
           )}
 
