@@ -119,11 +119,6 @@ export default function TeamsPage() {
       setMembros(r.data);
     } catch (e) {
       console.error(e);
-      if (axios.isAxiosError(e)) {
-        setMoverError(e.response?.data?.message || "Não foi possível alterar as equipes.");
-      } else {
-        setMoverError("Não foi possível alterar as equipes.");
-      }
     } finally {
       setLoadingMembros(false);
     }
@@ -195,6 +190,11 @@ export default function TeamsPage() {
       if (selected) await carregarMembros(selected.value, selected.tipo);
     } catch (e) {
       console.error(e);
+      if (axios.isAxiosError(e)) {
+        setMoverError(e.response?.data?.message || "Não foi possível alterar as equipes.");
+      } else {
+        setMoverError("Não foi possível alterar as equipes.");
+      }
     } finally {
       setSavingMover(false);
     }
