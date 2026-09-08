@@ -41,6 +41,37 @@ export type Encounters = {
   veterano: boolean;
 };
 
+const TEAM_LABEL_TO_VALUE: Record<string, string> = {
+  "Bandinha": "BANDINHA",
+  "Boa Vontade": "BOA_VONTADE",
+  "Biscoito": "BISCOITO",
+  "Recepção": "RECEPCAO",
+  "Sociodrama": "SOCIODRAMA",
+  "Trânsito": "TRANSITO",
+  "Garçons": "GARCONS",
+  "Oração": "ORACAO",
+  "Ordem": "ORDERM",
+  "Mídia": "MIDIA",
+  "Cozinha": "COZINHA",
+  "Círculo": "CIRCULO",
+  "Secretaria": "SECRETARIA",
+  "Apoio": "APOIO",
+  "Cerimonial": "CERIMONIAL",
+  "Roteiro": "ROTEIRO",
+  "Refeitório": "REFEITORIO",
+  "Não Optar": "NAO_OPTAR",
+};
+
+const normalizeTeamValue = (value: string) => TEAM_LABEL_TO_VALUE[value] ?? value;
+
+const normalizeEncounterTeams = (encounter: Encounters): Encounters => ({
+  ...encounter,
+  equipeFrente1: normalizeTeamValue(encounter.equipeFrente1),
+  equipeFrente2: normalizeTeamValue(encounter.equipeFrente2),
+  equipeFundo1: normalizeTeamValue(encounter.equipeFundo1),
+  equipeFundo2: normalizeTeamValue(encounter.equipeFundo2),
+});
+
 // ─── Helpers de UI ────────────────────────────────────────────────────────────
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -230,12 +261,12 @@ const DeleteEncounter = ({ encounter }: { encounter: Encounters }) => {
 export const EditEncounter = ({ encounter }: { encounter: Encounters }) => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"edit" | "info">("edit");
-  const [formData, setFormData] = useState({ ...encounter });
+  const [formData, setFormData] = useState(() => normalizeEncounterTeams(encounter));
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
-    setFormData({ ...encounter });
+    setFormData(normalizeEncounterTeams(encounter));
     setSaveError("");
   }, [encounter]);
 
