@@ -600,19 +600,19 @@ export default function EncountersForm() {
                   set("possuiNecessidadeEspecifica", value);
                   if (!value) set("necessidadeEspecifica", "");
                 }}
-                label="Você precisa de algum apoio, adaptação ou cuidado específico durante o evento?"
-                description="Ex.: mobilidade, comunicação, sensibilidade sensorial, autismo, TDAH, ansiedade ou outra necessidade importante para seu bem-estar."
+                label="Durante o evento, você precisará de algum recurso de acessibilidade, adaptação ou apoio específico?"
+                description="Você pode informar necessidades relacionadas à mobilidade, comunicação, sensibilidade sensorial, situações de ansiedade ou outro apoio importante. Não é necessário informar diagnóstico."
               />
 
               {formData.possuiNecessidadeEspecifica === true && (
                 <div className="pl-2 border-l-2 border-violet-300">
-                  <FormField label="Conte como podemos ajudar" required>
+                  <FormField label="Conte como podemos tornar sua participação mais segura e confortável" required>
                     <Textarea
                       value={formData.necessidadeEspecifica}
                       onChange={(e) =>
                         set("necessidadeEspecifica", e.target.value)
                       }
-                      placeholder="Descreva somente o que a equipe precisa saber para oferecer o apoio adequado."
+                      placeholder="Descreva apenas os recursos, adaptações ou apoios que a equipe precisa providenciar."
                       rows={4}
                     />
                   </FormField>
