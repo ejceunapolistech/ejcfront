@@ -190,7 +190,7 @@ export const columns: ColumnDef<Meet>[] = [
           </span>
           <span
             title={
-              possuiNecessidadeEspecifica === null
+              possuiNecessidadeEspecifica == null
                 ? "Necessidade específica não informada"
                 : possuiNecessidadeEspecifica
                   ? `Apoio necessário: ${necessidadeEspecifica || "informado"}`
