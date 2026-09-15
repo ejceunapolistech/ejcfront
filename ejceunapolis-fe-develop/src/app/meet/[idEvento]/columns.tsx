@@ -168,7 +168,6 @@ export const columns: ColumnDef<Meet>[] = [
         possuiDietaEspecial,
         dietaEspecial,
         possuiNecessidadeEspecifica,
-        necessidadeEspecifica,
       } = row.original;
       return (
         <div className="flex items-center gap-2">
@@ -193,7 +192,7 @@ export const columns: ColumnDef<Meet>[] = [
               possuiNecessidadeEspecifica == null
                 ? "Necessidade específica não informada"
                 : possuiNecessidadeEspecifica
-                  ? `Apoio necessário: ${necessidadeEspecifica || "informado"}`
+                  ? "Possui informação de apoio específico — abra o cadastro para consultar"
                   : "Não necessita de apoio específico"
             }
             className="cursor-default"
@@ -422,7 +421,7 @@ const EditEncontrista = ({ encontrista }: { encontrista: Meet }) => {
                     </div>
                   )}
                   <ToggleField
-                    label="Necessita de apoio, adaptação ou cuidado específico"
+                    label="Necessita de recurso de acessibilidade, adaptação ou apoio específico"
                     checked={formData.possuiNecessidadeEspecifica === true}
                     onChange={(v) => {
                       set("possuiNecessidadeEspecifica", v);
@@ -431,7 +430,7 @@ const EditEncontrista = ({ encontrista }: { encontrista: Meet }) => {
                   />
                   {formData.possuiNecessidadeEspecifica === true && (
                     <div className="pl-3 border-l-2 border-violet-500/30">
-                      <Field label="Apoio ou cuidado necessário">
+                      <Field label="Recurso, adaptação ou apoio necessário">
                         <Textarea
                           value={formData.necessidadeEspecifica ?? ""}
                           onChange={(e) => set("necessidadeEspecifica", e.target.value)}
@@ -534,8 +533,8 @@ const ViewEncontrista = ({ encontrista }: { encontrista: Meet }) => {
     medicamentosEspecificos: "Medicamentos de uso contínuo",
     possuiDietaEspecial: "Possui dieta especial",
     dietaEspecial: "Dieta especial",
-    possuiNecessidadeEspecifica: "Necessita de apoio específico",
-    necessidadeEspecifica: "Apoio ou cuidado necessário",
+    possuiNecessidadeEspecifica: "Necessita de acessibilidade, adaptação ou apoio",
+    necessidadeEspecifica: "Recurso, adaptação ou apoio necessário",
     statusPagamento: "Status de pagamento",
     dataCriacao: "Data de cadastro",
     idPagamento: "ID Pagamento",
