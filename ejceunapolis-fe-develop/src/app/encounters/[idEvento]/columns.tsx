@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 
 const equipeFundoOptions = ["ORACAO","ORDERM","MIDIA","COZINHA","CIRCULO","SECRETARIA","APOIO","CERIMONIAL","ROTEIRO","REFEITORIO"];
-const equipeFrenteOptions = ["BOA_VONTADE","BANDINHA","BISCOITO","RECEPCAO","SOCIODRAMA","TRANSITO","GARCONS"];
+const equipeFrenteOptions = ["BOA_VONTADE","BANDINHA","BISCOITO","RECEPCAO","SOCIODRAMA","TRANSITO","GARCONS","GARCOITO"];
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // ─── Tipo ────────────────────────────────────────────────────────────────────
@@ -49,6 +49,7 @@ const TEAM_LABEL_TO_VALUE: Record<string, string> = {
   "Sociodrama": "SOCIODRAMA",
   "Trânsito": "TRANSITO",
   "Garçons": "GARCONS",
+  "Garçoito": "GARCOITO",
   "Oração": "ORACAO",
   "Ordem": "ORDERM",
   "Mídia": "MIDIA",
