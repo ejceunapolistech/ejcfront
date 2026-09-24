@@ -16,7 +16,7 @@ import {
   User,
   MapPin,
   HeartPulse,
-  Accessibility,
+  HeartHandshake,
   Users,
   CreditCard,
   Loader2,
@@ -596,7 +596,7 @@ export default function EncountersForm() {
               <section className="space-y-5 rounded-2xl border border-violet-400/30 bg-violet-500/[0.06] p-4 sm:p-5">
                 <div className="flex items-start gap-3 border-b border-violet-400/20 pb-4">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300">
-                    <Accessibility className="h-5 w-5" />
+                    <HeartHandshake className="h-5 w-5" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-slate-50">
