@@ -30,6 +30,7 @@ const EQUIPE_FRENTE_OPTIONS = [
   { value: "SOCIODRAMA",  label: "Sociodrama" },
   { value: "TRANSITO",    label: "Trânsito" },
   { value: "GARCONS",     label: "Garçons" },
+  { value: "GARCOITO",    label: "Garçoito" },
 ];
 
 const EQUIPE_FUNDO_OPTIONS = [
@@ -53,6 +54,7 @@ const FRENTE_LABEL_TO_VALUE: Record<string, string> = {
   "Sociodrama": "SOCIODRAMA",
   "Trânsito":   "TRANSITO",
   "Garçons":    "GARCONS",
+  "Garçoito":   "GARCOITO",
 };
 
 const FUNDO_LABEL_TO_VALUE: Record<string, string> = {
@@ -340,6 +342,29 @@ export default function EncounterForm() {
     equipeFundo2: "",
     veterano: false,
   });
+
+  useEffect(() => {
+    if (equipeConfigs.length === 0) return;
+
+    setFormData((prev) => {
+      const next = {
+        ...prev,
+        equipeFrente1: isEquipeAtiva(prev.equipeFrente1, "FRENTE") ? prev.equipeFrente1 : "",
+        equipeFrente2: isEquipeAtiva(prev.equipeFrente2, "FRENTE") ? prev.equipeFrente2 : "",
+        equipeFundo1: isEquipeAtiva(prev.equipeFundo1, "FUNDO") ? prev.equipeFundo1 : "",
+        equipeFundo2: isEquipeAtiva(prev.equipeFundo2, "FUNDO") ? prev.equipeFundo2 : "",
+      };
+
+      const unchanged =
+        next.equipeFrente1 === prev.equipeFrente1 &&
+        next.equipeFrente2 === prev.equipeFrente2 &&
+        next.equipeFundo1 === prev.equipeFundo1 &&
+        next.equipeFundo2 === prev.equipeFundo2;
+
+      return unchanged ? prev : next;
+    });
+  }, [equipeConfigs]);
+
   // -------------------------------------------------------------------------
   // Helpers
   // -------------------------------------------------------------------------
@@ -359,6 +384,16 @@ export default function EncounterForm() {
     set("whatsapp", value);
   };
 
+  const normalizaFrenteAtiva = (label: string | null) => {
+    const value = normalizeFrenteSelection(label);
+    return value && isEquipeAtiva(value, "FRENTE") ? value : "";
+  };
+
+  const normalizaFundoAtiva = (label: string | null) => {
+    const value = normalizeFundoSelection(label);
+    return value && isEquipeAtiva(value, "FUNDO") ? value : "";
+  };
+
   const preencheFormComHistorico = (dados: DadosMaisRecentes) => {
     setFormData((prev) => ({
       ...prev,
@@ -370,10 +405,10 @@ export default function EncounterForm() {
       cidade:       dados.cidade       ?? prev.cidade,
       estado:       dados.estado       ?? prev.estado,
       religiao:     dados.religiao     ?? prev.religiao,
-      equipeFrente1: normalizeFrenteSelection(dados.equipeFrente1),
-      equipeFrente2: normalizeFrenteSelection(dados.equipeFrente2),
-      equipeFundo1: normalizeFundoSelection(dados.equipeFundo1),
-      equipeFundo2: normalizeFundoSelection(dados.equipeFundo2),
+      equipeFrente1: normalizaFrenteAtiva(dados.equipeFrente1),
+      equipeFrente2: normalizaFrenteAtiva(dados.equipeFrente2),
+      equipeFundo1: normalizaFundoAtiva(dados.equipeFundo1),
+      equipeFundo2: normalizaFundoAtiva(dados.equipeFundo2),
     }));
   };
   const handleSearchHistory = async () => {
@@ -415,10 +450,10 @@ export default function EncounterForm() {
   const handleSelectHistorico = (item: HistoricoItem) => {
     setFormData((prev) => ({
       ...prev,
-      equipeFrente1: normalizeFrenteSelection(item.equipeFrente1),
-      equipeFrente2: normalizeFrenteSelection(item.equipeFrente2),
-      equipeFundo1: normalizeFundoSelection(item.equipeFundo1),
-      equipeFundo2: normalizeFundoSelection(item.equipeFundo2),
+      equipeFrente1: normalizaFrenteAtiva(item.equipeFrente1),
+      equipeFrente2: normalizaFrenteAtiva(item.equipeFrente2),
+      equipeFundo1: normalizaFundoAtiva(item.equipeFundo1),
+      equipeFundo2: normalizaFundoAtiva(item.equipeFundo2),
     }));
     setScreen("form");
   };

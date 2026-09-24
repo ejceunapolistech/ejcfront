@@ -17,6 +17,7 @@ export const TEAM_MAP: Record<string, TeamInfo> = {
   SOCIODRAMA:  { label: "Sociodrama",  icon: Drama },
   TRANSITO:    { label: "Trânsito",    icon: TrafficCone },
   GARCONS:     { label: "Garçons",     icon: UtensilsCrossed },
+  GARCOITO:    { label: "Garçoito",    icon: Cookie },
   // Equipe de Fundo
   ORACAO:      { label: "Oração",      icon: HandHeart },
   ORDERM:      { label: "Ordem",       icon: ShoppingCart },

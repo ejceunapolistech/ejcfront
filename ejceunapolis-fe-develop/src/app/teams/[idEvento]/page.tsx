@@ -26,6 +26,7 @@ const EQUIPES_FRENTE = [
   { value: "SOCIODRAMA",  label: "Sociodrama" },
   { value: "TRANSITO",    label: "Trânsito" },
   { value: "GARCONS",     label: "Garçons" },
+  { value: "GARCOITO",    label: "Garçoito" },
 ];
 
 const EQUIPES_FUNDO = [
@@ -462,11 +463,11 @@ export default function TeamsPage() {
           <p className="text-xs text-slate-500 -mt-2">Selecione quatro equipes diferentes.</p>
           <div className="space-y-3 mt-3">
             {([
-              { label: "Frente — 1ª opção", value: moverFrente1, set: setMoverFrente1, opts: EQUIPES_FRENTE },
-              { label: "Frente — 2ª opção", value: moverFrente2, set: setMoverFrente2, opts: EQUIPES_FRENTE },
-              { label: "Fundo — 1ª opção",  value: moverFundo1,  set: setMoverFundo1,  opts: EQUIPES_FUNDO },
-              { label: "Fundo — 2ª opção",  value: moverFundo2,  set: setMoverFundo2,  opts: EQUIPES_FUNDO },
-            ] as const).map(({ label, value, set, opts }) => (
+              { label: "Frente — 1ª opção", value: moverFrente1, set: setMoverFrente1, opts: EQUIPES_FRENTE, tipo: "FRENTE" },
+              { label: "Frente — 2ª opção", value: moverFrente2, set: setMoverFrente2, opts: EQUIPES_FRENTE, tipo: "FRENTE" },
+              { label: "Fundo — 1ª opção",  value: moverFundo1,  set: setMoverFundo1,  opts: EQUIPES_FUNDO, tipo: "FUNDO" },
+              { label: "Fundo — 2ª opção",  value: moverFundo2,  set: setMoverFundo2,  opts: EQUIPES_FUNDO, tipo: "FUNDO" },
+            ] as const).map(({ label, value, set, opts, tipo }) => (
               <div key={label} className="space-y-1.5">
                 <label className="text-xs text-slate-400">{label}</label>
                 <Select value={value} onValueChange={set}>
@@ -474,7 +475,7 @@ export default function TeamsPage() {
                     <SelectValue placeholder="Não optar" />
                   </SelectTrigger>
                   <SelectContent>
-                    {opts.map((o) => (
+                    {opts.filter((o) => isAtiva(o.value, tipo)).map((o) => (
                       <SelectItem
                         key={o.value}
                         value={o.value}
