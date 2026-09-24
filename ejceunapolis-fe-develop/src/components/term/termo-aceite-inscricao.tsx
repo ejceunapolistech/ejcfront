@@ -1,15 +1,8 @@
 "use client";
 
-import { FileText } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, FileText, LockKeyhole } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 export const TERMO_INSCRICAO_VERSAO = "EJC-2026-v1";
 
@@ -146,92 +139,112 @@ export default function TermoAceiteInscricao({
   accepted,
   onAcceptedChange,
 }: TermoAceiteInscricaoProps) {
+  const [leituraConcluida, setLeituraConcluida] = useState(accepted);
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const element = event.currentTarget;
+    const chegouAoFim =
+      element.scrollHeight - element.scrollTop - element.clientHeight <= 24;
+
+    if (chegouAoFim) {
+      setLeituraConcluida(true);
+    }
+  };
+
   return (
-    <section className="rounded-xl border border-violet-400/30 bg-violet-500/[0.06] p-4">
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 rounded-lg bg-violet-500/15 p-2 text-violet-300">
-          <FileText className="h-5 w-5" aria-hidden="true" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-slate-100">
-            Termo de inscrição e participação
-          </h3>
-          <p className="mt-1 text-sm leading-relaxed text-slate-400">
-            Leia o termo completo antes de confirmar e seguir para o pagamento.
-          </p>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="mt-3 text-sm font-semibold text-violet-300 underline underline-offset-4 hover:text-violet-200"
-              >
-                Ler termo completo
-              </button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] max-w-2xl border-white/10 bg-[#101522] text-slate-200">
-              <DialogHeader>
-                <DialogTitle>Termo de aceite, inscrição e participação</DialogTitle>
-                <DialogDescription className="text-slate-400">
-                  EJC — Encontro de Jovens com Cristo de Eunápolis/BA · versão {TERMO_INSCRICAO_VERSAO}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="max-h-[65vh] space-y-5 overflow-y-auto pr-3 text-sm leading-relaxed text-slate-300">
-                <div className="space-y-1">
-                  <p><strong>Organização:</strong> EDG — Equipe de Direção Geral</p>
-                  <p><strong>Instituição:</strong> Igreja Adventista do Sétimo Dia</p>
-                  <p><strong>Local:</strong> Eunápolis — Bahia</p>
-                </div>
-
-                <p>
-                  Ao realizar sua inscrição, o participante declara que leu atentamente este termo,
-                  compreendeu seu conteúdo e concorda com as regras, condições e orientações da
-                  organização. Este termo integra as condições de inscrição e participação no EJC.
-                </p>
-
-                {secoes.map((secao) => (
-                  <section key={secao.titulo} className="space-y-2">
-                    <h4 className="font-semibold text-slate-100">{secao.titulo}</h4>
-                    <ul className="list-disc space-y-1.5 pl-5">
-                      {secao.itens.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-
-                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-                  <h4 className="font-semibold text-slate-100">Declaração de aceite</h4>
-                  <p className="mt-2">
-                    Declaro que li, compreendi e concordo integralmente com este Termo de Aceite,
-                    Inscrição e Condições de Participação do EJC.
-                  </p>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <label
-            htmlFor="termo-inscricao"
-            className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-white/10 bg-[#0B1020] p-3"
-          >
-            <Checkbox
-              id="termo-inscricao"
-              checked={accepted}
-              onCheckedChange={(checked) => onAcceptedChange(checked === true)}
-              className="mt-0.5 border-slate-500 data-[state=checked]:border-violet-500 data-[state=checked]:bg-violet-600"
-            />
-            <span className="text-sm leading-relaxed text-slate-200">
-              Li e concordo com o termo de inscrição e participação
-              <span className="text-rose-500"> *</span>
-              <span className="block text-xs text-slate-500">
-                Versão {TERMO_INSCRICAO_VERSAO}
-              </span>
-            </span>
-          </label>
+    <section className="space-y-4">
+      <div className="rounded-xl border border-violet-400/30 bg-violet-500/[0.06] p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 rounded-lg bg-violet-500/15 p-2 text-violet-300">
+            <FileText className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-slate-100">
+              Termo de inscrição e participação
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">
+              Leia o conteúdo abaixo e role até o final para liberar o aceite.
+            </p>
+          </div>
         </div>
       </div>
+
+      <div
+        onScroll={handleScroll}
+        tabIndex={0}
+        aria-label="Conteúdo completo do termo de inscrição"
+        className="h-[55vh] min-h-[340px] max-h-[620px] space-y-5 overflow-y-auto rounded-xl border border-white/15 bg-[#0B1020] p-4 pr-3 text-sm leading-relaxed text-slate-300 shadow-inner sm:h-[50vh] sm:p-6"
+      >
+        <div className="space-y-2 border-b border-white/10 pb-4">
+          <h3 className="text-base font-bold text-slate-50">
+            TERMO DE ACEITE, INSCRIÇÃO E CONDIÇÕES DE PARTICIPAÇÃO
+          </h3>
+          <p className="font-semibold text-violet-300">
+            EJC — Encontro de Jovens com Cristo de Eunápolis/BA
+          </p>
+          <p><strong>Organização:</strong> EDG — Equipe de Direção Geral</p>
+          <p><strong>Instituição:</strong> Igreja Adventista do Sétimo Dia</p>
+          <p><strong>Local:</strong> Eunápolis — Bahia</p>
+        </div>
+
+        <p>
+          Ao realizar sua inscrição, o participante declara que leu atentamente este termo,
+          compreendeu seu conteúdo e concorda com as regras, condições e orientações da
+          organização. Este termo integra as condições de inscrição e participação no EJC.
+        </p>
+
+        {secoes.map((secao) => (
+          <section key={secao.titulo} className="space-y-2">
+            <h3 className="font-semibold text-slate-100">{secao.titulo}</h3>
+            <ul className="list-disc space-y-1.5 pl-5">
+              {secao.itens.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        <div className="rounded-lg border border-violet-400/25 bg-violet-500/[0.07] p-4">
+          <h3 className="font-semibold text-slate-100">Declaração de aceite</h3>
+          <p className="mt-2">
+            Declaro que li, compreendi e concordo integralmente com este Termo de Aceite,
+            Inscrição e Condições de Participação do EJC.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 p-3 text-emerald-300">
+          <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span className="font-medium">Você chegou ao final do termo.</span>
+        </div>
+      </div>
+
+      {!leituraConcluida && (
+        <div className="flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          <LockKeyhole className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Role o termo até o final para habilitar a confirmação.
+        </div>
+      )}
+
+      <label
+        htmlFor="termo-inscricao"
+        className={`flex items-start gap-3 rounded-xl border p-4 transition-colors ${
+          leituraConcluida
+            ? "cursor-pointer border-violet-400/40 bg-violet-500/[0.08]"
+            : "cursor-not-allowed border-white/10 bg-white/[0.02] opacity-60"
+        }`}
+      >
+        <Checkbox
+          id="termo-inscricao"
+          checked={accepted}
+          disabled={!leituraConcluida}
+          onCheckedChange={(checked) => onAcceptedChange(checked === true)}
+          className="mt-0.5 border-slate-500 data-[state=checked]:border-violet-500 data-[state=checked]:bg-violet-600"
+        />
+        <span className="text-sm font-medium leading-relaxed text-slate-100">
+          Li e concordo com o termo de inscrição e participação
+          <span className="text-rose-500"> *</span>
+        </span>
+      </label>
     </section>
   );
 }
