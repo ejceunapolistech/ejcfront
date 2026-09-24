@@ -24,6 +24,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import TermoAceiteInscricao from "@/components/term/termo-aceite-inscricao";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 interface FormData {
@@ -51,6 +52,7 @@ interface FormData {
   nomePadrinho: string;
   whatsappPadrinho: string;
   circulo: string;
+  termoAceito: boolean;
 }
 
 const STEPS = [
@@ -136,11 +138,9 @@ export default function EncountersForm() {
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [uploadingFoto, setUploadingFoto] = useState(false);
   const [error, setError] = useState("");
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
-  const [idEncontristaCadastrado, setIdEncontristaCadastrado] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     nomeCompleto: "",
@@ -167,6 +167,7 @@ export default function EncountersForm() {
     nomePadrinho: "",
     whatsappPadrinho: "",
     circulo: "AZUL",
+    termoAceito: false,
   });
 
   const set = <K extends keyof FormData>(field: K, value: FormData[K]) =>
@@ -253,28 +254,17 @@ export default function EncountersForm() {
     setFotoPreview(null);
   };
 
-  // Step 5 → 6: cadastra o encontrista e faz upload da foto
-  const handleAvancarParaPagamento = async () => {
-    if (!fotoFile || !idEncontristaCadastrado) return;
-    setUploadingFoto(true);
-    setError("");
-    try {
-      const formDataFoto = new FormData();
-      formDataFoto.append("foto", fotoFile);
-      await axios.post(
-        `${API_BASE_URL}/ejceunapolis/api/encontrista/${idEncontristaCadastrado}/foto`,
-        formDataFoto,
-        { headers: { "Content-Type": "multipart/form-data", Accept: "*/*" } }
-      );
-      setStep(6);
-    } catch (err) {
-      setError("Erro ao enviar a foto. Tente novamente.");
-    } finally {
-      setUploadingFoto(false);
-    }
-  };
-
   const handleSubmit = async () => {
+    if (!formData.termoAceito) {
+      setError("Leia e aceite o termo de inscrição antes de continuar.");
+      return;
+    }
+    if (!fotoFile) {
+      setError("Selecione uma foto antes de continuar.");
+      setStep(5);
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
@@ -284,8 +274,6 @@ export default function EncountersForm() {
         { headers: { "Content-Type": "application/json", Accept: "*/*" } }
       );
       const idEncontrista = response.data.idEncontrista;
-      setIdEncontristaCadastrado(idEncontrista);
-
       // Upload da foto
       const formDataFoto = new FormData();
       formDataFoto.append("foto", fotoFile!);
@@ -818,6 +806,14 @@ export default function EncountersForm() {
                 )}
               </div>
 
+              <TermoAceiteInscricao
+                accepted={formData.termoAceito}
+                onAcceptedChange={(accepted) => {
+                  set("termoAceito", accepted);
+                  if (accepted) setError("");
+                }}
+              />
+
               {error && (
                 <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
                   {error}
@@ -826,7 +822,7 @@ export default function EncountersForm() {
 
               <Button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || !formData.termoAceito}
                 className="w-full h-12 text-base bg-[#6D3DF2] hover:bg-[#5B2DD8] text-white rounded-xl"
               >
                 {loading ? (
@@ -864,7 +860,7 @@ export default function EncountersForm() {
             </div>
           )}
 
-          {/* Navegação step 5 — foto obrigatória, avança fazendo cadastro + upload */}
+          {/* Navegação step 5 — a foto é revisada antes da confirmação final */}
           {step === 5 && (
             <div className="flex justify-between mt-8 pt-6 border-t border-white/10">
               <Button
@@ -876,21 +872,15 @@ export default function EncountersForm() {
                 Voltar
               </Button>
               <Button
-                onClick={handleSubmit}
-                disabled={!fotoFile || loading}
+                onClick={() => {
+                  setError("");
+                  setStep(6);
+                }}
+                disabled={!fotoFile}
                 className="gap-1 bg-[#6D3DF2] hover:bg-[#5B2DD8] text-white rounded-xl px-6 disabled:opacity-40"
               >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Enviando...
-                  </span>
-                ) : (
-                  <>
-                    Confirmar e Pagar
-                    <ChevronRight className="w-4 h-4" />
-                  </>
-                )}
+                Revisar inscrição
+                <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
           )}

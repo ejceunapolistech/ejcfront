@@ -17,6 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { getTeamInfo } from "@/constants/team-icons";
+import TermoAceiteInscricao from "@/components/term/termo-aceite-inscricao";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -134,6 +135,7 @@ interface FormData {
   equipeFundo1: string;
   equipeFundo2: string;
   veterano: boolean;
+  termoAceito: boolean;
 }
 // ---------------------------------------------------------------------------
 // Steps config
@@ -341,6 +343,7 @@ export default function EncounterForm() {
     equipeFundo1: "",
     equipeFundo2: "",
     veterano: false,
+    termoAceito: false,
   });
 
   useEffect(() => {
@@ -369,7 +372,7 @@ export default function EncounterForm() {
   // Helpers
   // -------------------------------------------------------------------------
 
-  const set = (field: keyof FormData, value: string) =>
+  const set = <K extends keyof FormData>(field: K, value: FormData[K]) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   const formatPhone = (e: React.FormEvent<HTMLInputElement>) => {
@@ -494,6 +497,11 @@ export default function EncounterForm() {
   // -------------------------------------------------------------------------
 
   const handleSubmit = async () => {
+    if (!formData.termoAceito) {
+      setError("Leia e aceite o termo de inscrição antes de continuar.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
@@ -1014,6 +1022,14 @@ export default function EncounterForm() {
                     </ReviewSection>
                   </div>
 
+                  <TermoAceiteInscricao
+                    accepted={formData.termoAceito}
+                    onAcceptedChange={(accepted) => {
+                      set("termoAceito", accepted);
+                      if (accepted) setError("");
+                    }}
+                  />
+
                   {error && (
                     <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
                       {error}
@@ -1022,7 +1038,7 @@ export default function EncounterForm() {
 
                   <Button
                     onClick={handleSubmit}
-                    disabled={loading}
+                    disabled={loading || !formData.termoAceito}
                     className="w-full h-12 text-base bg-[#6D3DF2] hover:bg-[#5B2DD8] text-white rounded-xl"
                   >
                     {loading ? (
