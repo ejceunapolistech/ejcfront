@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -44,6 +45,8 @@ interface FormData {
   medicamentosEspecificos: string;
   possuiDietaEspecial: boolean;
   dietaEspecial: string;
+  possuiNecessidadeEspecifica: boolean | null;
+  necessidadeEspecifica: string;
   nomePadrinho: string;
   whatsappPadrinho: string;
   circulo: string;
@@ -117,6 +120,50 @@ function ToggleCard({
   );
 }
 
+function RequiredBooleanChoice({
+  value,
+  onChange,
+  label,
+  description,
+}: {
+  value: boolean | null;
+  onChange: (value: boolean) => void;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium text-gray-700">
+        {label}
+        <span className="text-rose-500 ml-1">*</span>
+      </Label>
+      {description && <p className="text-xs text-gray-500">{description}</p>}
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { value: true, label: "Sim" },
+          { value: false, label: "Não" },
+        ].map((option) => {
+          const selected = value === option.value;
+          return (
+            <button
+              key={option.label}
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all ${
+                selected
+                  ? "border-[#6D3DF2] bg-[#6D3DF2]/10 text-indigo-700"
+                  : "border-white/10 bg-[#101522] text-gray-700 hover:border-white/20"
+              }`}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 export default function EncountersForm() {
   const params = useParams();
@@ -151,6 +198,8 @@ export default function EncountersForm() {
     medicamentosEspecificos: "",
     possuiDietaEspecial: false,
     dietaEspecial: "",
+    possuiNecessidadeEspecifica: null,
+    necessidadeEspecifica: "",
     nomePadrinho: "",
     whatsappPadrinho: "",
     circulo: "AZUL",
@@ -201,7 +250,10 @@ export default function EncountersForm() {
     formData.cidade.trim() !== "" &&
     formData.estado.trim() !== "";
 
-  const isStep3Valid = true; // saúde é opcional
+  const isStep3Valid =
+    formData.possuiNecessidadeEspecifica !== null &&
+    (!formData.possuiNecessidadeEspecifica ||
+      formData.necessidadeEspecifica.trim() !== "");
 
   const isStep4Valid =
     formData.nomePadrinho.trim() !== "" &&
@@ -537,6 +589,31 @@ export default function EncountersForm() {
                       value={formData.dietaEspecial}
                       onChange={(e) => set("dietaEspecial", e.target.value)}
                       placeholder="Ex: Vegetariano, sem glúten..."
+                    />
+                  </FormField>
+                </div>
+              )}
+
+              <RequiredBooleanChoice
+                value={formData.possuiNecessidadeEspecifica}
+                onChange={(value) => {
+                  set("possuiNecessidadeEspecifica", value);
+                  if (!value) set("necessidadeEspecifica", "");
+                }}
+                label="Durante o evento, você precisará de algum recurso de acessibilidade, adaptação ou apoio específico?"
+                description="Você pode informar necessidades relacionadas à mobilidade, comunicação, sensibilidade sensorial, situações de ansiedade ou outro apoio importante. Não é necessário informar diagnóstico."
+              />
+
+              {formData.possuiNecessidadeEspecifica === true && (
+                <div className="pl-2 border-l-2 border-violet-300">
+                  <FormField label="Conte como podemos tornar sua participação mais segura e confortável" required>
+                    <Textarea
+                      value={formData.necessidadeEspecifica}
+                      onChange={(e) =>
+                        set("necessidadeEspecifica", e.target.value)
+                      }
+                      placeholder="Descreva apenas os recursos, adaptações ou apoios que a equipe precisa providenciar."
+                      rows={4}
                     />
                   </FormField>
                 </div>

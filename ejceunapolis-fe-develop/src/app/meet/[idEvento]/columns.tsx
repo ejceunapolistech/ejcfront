@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle2, Copy, ExternalLink, Eye, Leaf, Pen, Pill, Trash2 } from "lucide-react";
+import { Accessibility, CheckCircle2, Copy, ExternalLink, Eye, Leaf, Pen, Pill, Trash2 } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -36,6 +37,8 @@ export type Meet = {
   medicamentosEspecificos: string;
   possuiDietaEspecial: boolean;
   dietaEspecial: string;
+  possuiNecessidadeEspecifica: boolean | null;
+  necessidadeEspecifica: string;
   fotoUrl?: string;
 };
 
@@ -159,7 +162,13 @@ export const columns: ColumnDef<Meet>[] = [
     id: "saude",
     header: "Saúde",
     cell: ({ row }) => {
-      const { alergicoMedicamentos, medicamentosAlergia, possuiDietaEspecial, dietaEspecial } = row.original;
+      const {
+        alergicoMedicamentos,
+        medicamentosAlergia,
+        possuiDietaEspecial,
+        dietaEspecial,
+        possuiNecessidadeEspecifica,
+      } = row.original;
       return (
         <div className="flex items-center gap-2">
           <span
@@ -177,6 +186,24 @@ export const columns: ColumnDef<Meet>[] = [
             className="cursor-default"
           >
             <Leaf className={`w-4 h-4 ${possuiDietaEspecial ? "text-amber-400" : "text-slate-700"}`} />
+          </span>
+          <span
+            title={
+              possuiNecessidadeEspecifica == null
+                ? "Necessidade específica não informada"
+                : possuiNecessidadeEspecifica
+                  ? "Possui informação de apoio específico — abra o cadastro para consultar"
+                  : "Não necessita de apoio específico"
+            }
+            className="cursor-default"
+          >
+            <Accessibility
+              className={`w-4 h-4 ${
+                possuiNecessidadeEspecifica
+                  ? "text-violet-400"
+                  : "text-slate-700"
+              }`}
+            />
           </span>
         </div>
       );
@@ -393,6 +420,25 @@ const EditEncontrista = ({ encontrista }: { encontrista: Meet }) => {
                       </Field>
                     </div>
                   )}
+                  <ToggleField
+                    label="Necessita de recurso de acessibilidade, adaptação ou apoio específico"
+                    checked={formData.possuiNecessidadeEspecifica === true}
+                    onChange={(v) => {
+                      set("possuiNecessidadeEspecifica", v);
+                      if (!v) set("necessidadeEspecifica", "");
+                    }}
+                  />
+                  {formData.possuiNecessidadeEspecifica === true && (
+                    <div className="pl-3 border-l-2 border-violet-500/30">
+                      <Field label="Recurso, adaptação ou apoio necessário">
+                        <Textarea
+                          value={formData.necessidadeEspecifica ?? ""}
+                          onChange={(e) => set("necessidadeEspecifica", e.target.value)}
+                          rows={4}
+                        />
+                      </Field>
+                    </div>
+                  )}
                 </div>
               </Section>
 
@@ -487,6 +533,8 @@ const ViewEncontrista = ({ encontrista }: { encontrista: Meet }) => {
     medicamentosEspecificos: "Medicamentos de uso contínuo",
     possuiDietaEspecial: "Possui dieta especial",
     dietaEspecial: "Dieta especial",
+    possuiNecessidadeEspecifica: "Necessita de acessibilidade, adaptação ou apoio",
+    necessidadeEspecifica: "Recurso, adaptação ou apoio necessário",
     statusPagamento: "Status de pagamento",
     dataCriacao: "Data de cadastro",
     idPagamento: "ID Pagamento",
