@@ -18,6 +18,7 @@ import {
   HeartPulse,
   HeartHandshake,
   Users,
+  ScrollText,
   CreditCard,
   Loader2,
   Camera,
@@ -61,7 +62,8 @@ const STEPS = [
   { id: 3, label: "Saúde", icon: HeartPulse },
   { id: 4, label: "Padrinho", icon: Users },
   { id: 5, label: "Foto", icon: Camera },
-  { id: 6, label: "Pagamento", icon: CreditCard },
+  { id: 6, label: "Termo", icon: ScrollText },
+  { id: 7, label: "Pagamento", icon: CreditCard },
 ];
 
 // ─── Componentes auxiliares ───────────────────────────────────────────────────
@@ -237,7 +239,8 @@ export default function EncountersForm() {
     (step === 2 && isStep2Valid) ||
     (step === 3 && isStep3Valid) ||
     (step === 4 && isStep4Valid) ||
-    (step === 5 && isStep5Valid);
+    (step === 5 && isStep5Valid) ||
+    (step === 6 && formData.termoAceito);
 
   // Seleciona foto e gera preview
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -712,8 +715,21 @@ export default function EncountersForm() {
             </div>
           )}
 
-          {/* Step 6 — Revisão e Pagamento */}
+          {/* Step 6 — Termo */}
           {step === 6 && (
+            <div className="space-y-5">
+              <TermoAceiteInscricao
+                accepted={formData.termoAceito}
+                onAcceptedChange={(accepted) => {
+                  set("termoAceito", accepted);
+                  if (accepted) setError("");
+                }}
+              />
+            </div>
+          )}
+
+          {/* Step 7 — Revisão e Pagamento */}
+          {step === 7 && (
             <div className="space-y-5">
               <h2 className="text-lg font-semibold text-slate-50 mb-4">
                 Revisão e Pagamento
@@ -806,14 +822,6 @@ export default function EncountersForm() {
                 )}
               </div>
 
-              <TermoAceiteInscricao
-                accepted={formData.termoAceito}
-                onAcceptedChange={(accepted) => {
-                  set("termoAceito", accepted);
-                  if (accepted) setError("");
-                }}
-              />
-
               {error && (
                 <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
                   {error}
@@ -879,18 +887,40 @@ export default function EncountersForm() {
                 disabled={!fotoFile}
                 className="gap-1 bg-[#6D3DF2] hover:bg-[#5B2DD8] text-white rounded-xl px-6 disabled:opacity-40"
               >
-                Revisar inscrição
+                Ler o termo
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
           )}
 
-          {/* Navegação step 6 — revisão, só voltar */}
+          {/* Navegação step 6 — aceite obrigatório antes do pagamento */}
           {step === 6 && (
-            <div className="flex justify-start mt-6 pt-4 border-t border-white/10">
+            <div className="flex justify-between mt-8 pt-6 border-t border-white/10">
               <Button
                 variant="ghost"
                 onClick={() => setStep(5)}
+                className="gap-1 text-slate-400 hover:text-slate-200"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Voltar
+              </Button>
+              <Button
+                onClick={() => setStep(7)}
+                disabled={!canAdvance}
+                className="gap-1 bg-[#6D3DF2] hover:bg-[#5B2DD8] text-white rounded-xl px-6 disabled:opacity-40"
+              >
+                Ir para pagamento
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+
+          {/* Navegação step 7 — revisão e pagamento */}
+          {step === 7 && (
+            <div className="flex justify-start mt-6 pt-4 border-t border-white/10">
+              <Button
+                variant="ghost"
+                onClick={() => setStep(6)}
                 className="gap-1 text-slate-400 hover:text-slate-200"
               >
                 <ChevronLeft className="w-4 h-4" />
