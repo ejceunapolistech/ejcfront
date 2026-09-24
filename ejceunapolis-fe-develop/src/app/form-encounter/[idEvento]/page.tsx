@@ -10,7 +10,7 @@ import Image from "next/image";
 import logo from "@/app/assets/img/logo-2025.png";
 import {
   CheckCircle2, ChevronRight, ChevronLeft, User, MapPin,
-  Users, CreditCard, Loader2, History, Search,
+  Users, ScrollText, CreditCard, Loader2, History, Search,
 } from "lucide-react";
 import TeamLabel from "@/components/team/team-label";
 import {
@@ -145,7 +145,8 @@ const STEPS = [
   { id: 1, label: "Dados Pessoais", icon: User },
   { id: 2, label: "Endereço",       icon: MapPin },
   { id: 3, label: "Equipes",        icon: Users },
-  { id: 4, label: "Pagamento",      icon: CreditCard },
+  { id: 4, label: "Termo",          icon: ScrollText },
+  { id: 5, label: "Pagamento",      icon: CreditCard },
 ];
 
 // ---------------------------------------------------------------------------
@@ -491,7 +492,8 @@ export default function EncounterForm() {
   const canAdvance =
     (step === 1 && isStep1Valid) ||
     (step === 2 && isStep2Valid) ||
-    (step === 3 && isStep3Valid);
+    (step === 3 && isStep3Valid) ||
+    (step === 4 && formData.termoAceito);
   // -------------------------------------------------------------------------
   // Submit
   // -------------------------------------------------------------------------
@@ -975,8 +977,21 @@ export default function EncounterForm() {
                   </div>
                 </div>
               )}
-              {/* ---- Step 4: Revisão e Pagamento ---- */}
+              {/* ---- Step 4: Termo ---- */}
               {step === 4 && (
+                <div className="space-y-5">
+                  <TermoAceiteInscricao
+                    accepted={formData.termoAceito}
+                    onAcceptedChange={(accepted) => {
+                      set("termoAceito", accepted);
+                      if (accepted) setError("");
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* ---- Step 5: Revisão e Pagamento ---- */}
+              {step === 5 && (
                 <div className="space-y-5">
                   <h2 className="text-lg font-semibold text-slate-50 mb-4">
                     Revisão e Pagamento
@@ -1022,14 +1037,6 @@ export default function EncounterForm() {
                     </ReviewSection>
                   </div>
 
-                  <TermoAceiteInscricao
-                    accepted={formData.termoAceito}
-                    onAcceptedChange={(accepted) => {
-                      set("termoAceito", accepted);
-                      if (accepted) setError("");
-                    }}
-                  />
-
                   {error && (
                     <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
                       {error}
@@ -1053,7 +1060,7 @@ export default function EncounterForm() {
                 </div>
               )}
               {/* Navigation buttons */}
-              {step < 4 && (
+              {step < 5 && (
                 <div className="flex justify-between mt-8 pt-6 border-t border-white/10">
                   <Button
                     variant="ghost"
@@ -1076,11 +1083,11 @@ export default function EncounterForm() {
                 </div>
               )}
 
-              {step === 4 && (
+              {step === 5 && (
                 <div className="flex justify-start mt-6 pt-4 border-t border-white/10">
                   <Button
                     variant="ghost"
-                    onClick={() => setStep(3)}
+                    onClick={() => setStep(4)}
                     className="gap-1 text-slate-400 hover:text-slate-200"
                   >
                     <ChevronLeft className="w-4 h-4" />
