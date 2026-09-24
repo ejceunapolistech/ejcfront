@@ -16,6 +16,7 @@ import {
   User,
   MapPin,
   HeartPulse,
+  Accessibility,
   Users,
   CreditCard,
   Loader2,
@@ -40,10 +41,10 @@ interface FormData {
   religiao: string;
   whatsapp: string;
   instagram: string;
-  alergicoMedicamentos: boolean;
+  alergicoMedicamentos: boolean | null;
   medicamentosAlergia: string;
   medicamentosEspecificos: string;
-  possuiDietaEspecial: boolean;
+  possuiDietaEspecial: boolean | null;
   dietaEspecial: string;
   possuiNecessidadeEspecifica: boolean | null;
   necessidadeEspecifica: string;
@@ -73,50 +74,12 @@ function FormField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="text-sm font-medium text-gray-700">
+      <Label className="text-sm font-medium text-slate-300">
         {label}
         {required && <span className="text-rose-500 ml-1">*</span>}
       </Label>
       {children}
     </div>
-  );
-}
-
-function ToggleCard({
-  checked,
-  onChange,
-  label,
-  description,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-  description?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-all duration-200
-        ${checked ? "border-[#6D3DF2] bg-[#6D3DF2]/10" : "border-white/10 bg-[#101522] hover:border-white/20"}`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className={`text-sm font-medium ${checked ? "text-indigo-700" : "text-gray-700"}`}>
-            {label}
-          </p>
-          {description && (
-            <p className="text-xs text-gray-500 mt-0.5">{description}</p>
-          )}
-        </div>
-        <div
-          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
-            ${checked ? "border-[#6D3DF2] bg-[#6D3DF2]/100" : "border-gray-300"}`}
-        >
-          {checked && <div className="w-2 h-2 rounded-full bg-white" />}
-        </div>
-      </div>
-    </button>
   );
 }
 
@@ -133,11 +96,11 @@ function RequiredBooleanChoice({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-gray-700">
+      <Label className="text-sm font-semibold text-slate-100">
         {label}
         <span className="text-rose-500 ml-1">*</span>
       </Label>
-      {description && <p className="text-xs text-gray-500">{description}</p>}
+      {description && <p className="text-xs leading-relaxed text-slate-400">{description}</p>}
       <div className="grid grid-cols-2 gap-3">
         {[
           { value: true, label: "Sim" },
@@ -149,10 +112,11 @@ function RequiredBooleanChoice({
               key={option.label}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all ${
+              aria-pressed={selected}
+              className={`rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all ${
                 selected
-                  ? "border-[#6D3DF2] bg-[#6D3DF2]/10 text-indigo-700"
-                  : "border-white/10 bg-[#101522] text-gray-700 hover:border-white/20"
+                  ? "border-[#8B5CF6] bg-violet-500/15 text-violet-200 shadow-sm shadow-violet-950/40"
+                  : "border-white/15 bg-[#0B101D] text-slate-300 hover:border-violet-400/50 hover:text-slate-100"
               }`}
             >
               {option.label}
@@ -193,10 +157,10 @@ export default function EncountersForm() {
     religiao: "",
     whatsapp: "",
     instagram: "",
-    alergicoMedicamentos: false,
+    alergicoMedicamentos: null,
     medicamentosAlergia: "",
     medicamentosEspecificos: "",
-    possuiDietaEspecial: false,
+    possuiDietaEspecial: null,
     dietaEspecial: "",
     possuiNecessidadeEspecifica: null,
     necessidadeEspecifica: "",
@@ -251,6 +215,12 @@ export default function EncountersForm() {
     formData.estado.trim() !== "";
 
   const isStep3Valid =
+    formData.alergicoMedicamentos !== null &&
+    (!formData.alergicoMedicamentos ||
+      formData.medicamentosAlergia.trim() !== "") &&
+    formData.possuiDietaEspecial !== null &&
+    (!formData.possuiDietaEspecial ||
+      formData.dietaEspecial.trim() !== "") &&
     formData.possuiNecessidadeEspecifica !== null &&
     (!formData.possuiNecessidadeEspecifica ||
       formData.necessidadeEspecifica.trim() !== "");
@@ -536,88 +506,134 @@ export default function EncountersForm() {
 
           {/* Step 3 — Saúde */}
           {step === 3 && (
-            <div className="space-y-5">
-              <h2 className="text-lg font-semibold text-slate-50 mb-1">
-                Informações de Saúde
-              </h2>
-              <p className="text-sm text-gray-500 mb-4">
-                Essas informações são importantes para garantir seu bem-estar
-                durante o evento.
-              </p>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-50">
+                  Informações de Saúde
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                  Essas informações são importantes para garantir seu bem-estar
+                  durante o evento.
+                </p>
+              </div>
 
-              <ToggleCard
-                checked={formData.alergicoMedicamentos}
-                onChange={(v) => set("alergicoMedicamentos", v)}
-                label="Tenho alergia a medicamentos"
-                description="Marque se você possui alguma alergia conhecida"
-              />
-
-              {formData.alergicoMedicamentos && (
-                <div className="space-y-4 pl-2 border-l-2 border-rose-200">
-                  <FormField label="Medicamentos com alergia">
-                    <Input
-                      value={formData.medicamentosAlergia}
-                      onChange={(e) =>
-                        set("medicamentosAlergia", e.target.value)
-                      }
-                      placeholder="Ex: Dipirona, Penicilina..."
-                    />
-                  </FormField>
-                  <FormField label="Medicamentos específicos que usa">
-                    <Input
-                      value={formData.medicamentosEspecificos}
-                      onChange={(e) =>
-                        set("medicamentosEspecificos", e.target.value)
-                      }
-                      placeholder="Medicamentos de uso contínuo"
-                    />
-                  </FormField>
+              <section className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.025] p-4 sm:p-5">
+                <div className="flex items-start gap-3 border-b border-white/10 pb-4">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-300">
+                    <HeartPulse className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-100">
+                      Alergias e alimentação
+                    </h3>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                      Selecione Sim ou Não em cada pergunta.
+                    </p>
+                  </div>
                 </div>
-              )}
 
-              <ToggleCard
-                checked={formData.possuiDietaEspecial}
-                onChange={(v) => set("possuiDietaEspecial", v)}
-                label="Possuo dieta especial"
-                description="Vegetariano, intolerância alimentar, etc."
-              />
+                <RequiredBooleanChoice
+                  value={formData.alergicoMedicamentos}
+                  onChange={(value) => {
+                    set("alergicoMedicamentos", value);
+                    if (!value) {
+                      set("medicamentosAlergia", "");
+                      set("medicamentosEspecificos", "");
+                    }
+                  }}
+                  label="Possui alergia a medicamentos?"
+                  description="Informe se você possui alguma alergia conhecida."
+                />
 
-              {formData.possuiDietaEspecial && (
-                <div className="pl-2 border-l-2 border-amber-200">
-                  <FormField label="Descreva sua dieta">
-                    <Input
-                      value={formData.dietaEspecial}
-                      onChange={(e) => set("dietaEspecial", e.target.value)}
-                      placeholder="Ex: Vegetariano, sem glúten..."
-                    />
-                  </FormField>
+                {formData.alergicoMedicamentos === true && (
+                  <div className="space-y-4 border-l-2 border-rose-400/50 pl-4">
+                    <FormField label="Quais medicamentos causam alergia?" required>
+                      <Input
+                        value={formData.medicamentosAlergia}
+                        onChange={(e) =>
+                          set("medicamentosAlergia", e.target.value)
+                        }
+                        placeholder="Ex: Dipirona, Penicilina..."
+                      />
+                    </FormField>
+                    <FormField label="Medicamentos específicos que usa">
+                      <Input
+                        value={formData.medicamentosEspecificos}
+                        onChange={(e) =>
+                          set("medicamentosEspecificos", e.target.value)
+                        }
+                        placeholder="Medicamentos de uso contínuo"
+                      />
+                    </FormField>
+                  </div>
+                )}
+
+                <div className="border-t border-white/10 pt-5">
+                  <RequiredBooleanChoice
+                    value={formData.possuiDietaEspecial}
+                    onChange={(value) => {
+                      set("possuiDietaEspecial", value);
+                      if (!value) set("dietaEspecial", "");
+                    }}
+                    label="Possui dieta especial ou alguma restrição alimentar?"
+                    description="Por exemplo: alimentação vegetariana, intolerância à lactose, glúten ou outra restrição."
+                  />
                 </div>
-              )}
 
-              <RequiredBooleanChoice
-                value={formData.possuiNecessidadeEspecifica}
-                onChange={(value) => {
-                  set("possuiNecessidadeEspecifica", value);
-                  if (!value) set("necessidadeEspecifica", "");
-                }}
-                label="Durante o evento, você precisará de algum recurso de acessibilidade, adaptação ou apoio específico?"
-                description="Você pode informar necessidades relacionadas à mobilidade, comunicação, sensibilidade sensorial, situações de ansiedade ou outro apoio importante. Não é necessário informar diagnóstico."
-              />
+                {formData.possuiDietaEspecial === true && (
+                  <div className="border-l-2 border-amber-400/50 pl-4">
+                    <FormField label="Descreva sua dieta ou restrição alimentar" required>
+                      <Input
+                        value={formData.dietaEspecial}
+                        onChange={(e) => set("dietaEspecial", e.target.value)}
+                        placeholder="Ex: Vegetariano, sem glúten..."
+                      />
+                    </FormField>
+                  </div>
+                )}
+              </section>
 
-              {formData.possuiNecessidadeEspecifica === true && (
-                <div className="pl-2 border-l-2 border-violet-300">
-                  <FormField label="Conte como podemos tornar sua participação mais segura e confortável" required>
-                    <Textarea
-                      value={formData.necessidadeEspecifica}
-                      onChange={(e) =>
-                        set("necessidadeEspecifica", e.target.value)
-                      }
-                      placeholder="Descreva apenas os recursos, adaptações ou apoios que a equipe precisa providenciar."
-                      rows={4}
-                    />
-                  </FormField>
+              <section className="space-y-5 rounded-2xl border border-violet-400/30 bg-violet-500/[0.06] p-4 sm:p-5">
+                <div className="flex items-start gap-3 border-b border-violet-400/20 pb-4">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300">
+                    <Accessibility className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-50">
+                      Acessibilidade e necessidades de apoio
+                    </h3>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-300">
+                      Conte somente o que a equipe precisa saber para acolher você
+                      com segurança e conforto.
+                    </p>
+                  </div>
                 </div>
-              )}
+
+                <RequiredBooleanChoice
+                  value={formData.possuiNecessidadeEspecifica}
+                  onChange={(value) => {
+                    set("possuiNecessidadeEspecifica", value);
+                    if (!value) set("necessidadeEspecifica", "");
+                  }}
+                  label="Durante o evento, você precisará de algum recurso de acessibilidade, adaptação ou apoio específico?"
+                  description="Pode envolver mobilidade, comunicação, sensibilidade sensorial, situações de ansiedade ou outro apoio importante. Não é necessário informar diagnóstico."
+                />
+
+                {formData.possuiNecessidadeEspecifica === true && (
+                  <div className="border-l-2 border-violet-400/60 pl-4">
+                    <FormField label="Conte como podemos tornar sua participação mais segura e confortável" required>
+                      <Textarea
+                        value={formData.necessidadeEspecifica}
+                        onChange={(e) =>
+                          set("necessidadeEspecifica", e.target.value)
+                        }
+                        placeholder="Descreva apenas os recursos, adaptações ou apoios que a equipe precisa providenciar."
+                        rows={4}
+                      />
+                    </FormField>
+                  </div>
+                )}
+              </section>
             </div>
           )}
 
@@ -767,6 +783,16 @@ export default function EncountersForm() {
                     <ReviewRow
                       label="Dieta"
                       value={formData.dietaEspecial || "—"}
+                    />
+                  )}
+                  <ReviewRow
+                    label="Acessibilidade ou apoio"
+                    value={formData.possuiNecessidadeEspecifica ? "Sim" : "Não"}
+                  />
+                  {formData.possuiNecessidadeEspecifica && (
+                    <ReviewRow
+                      label="Apoio necessário"
+                      value={formData.necessidadeEspecifica || "—"}
                     />
                   )}
                 </ReviewSection>
