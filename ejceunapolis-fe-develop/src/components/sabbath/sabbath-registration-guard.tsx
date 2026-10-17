@@ -105,9 +105,6 @@ export default function SabbathRegistrationGuard({
             <Moon className="h-8 w-8 text-[#C4B5FD]" aria-hidden="true" />
           </div>
 
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#A78BFA]">
-            EJC Eunápolis
-          </p>
           <h1 className="text-2xl font-bold text-slate-50 sm:text-3xl">
             Estamos no período sabático
           </h1>
