@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { getTeamInfo } from "@/constants/team-icons";
 import TermoAceiteInscricao from "@/components/term/termo-aceite-inscricao";
+import SabbathRegistrationGuard from "@/components/sabbath/sabbath-registration-guard";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -537,7 +538,8 @@ export default function EncounterForm() {
   // -------------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#070A13] via-[#0A0D18] to-[#120A1F] flex items-center justify-center p-4">
+    <SabbathRegistrationGuard>
+      <div className="min-h-screen bg-gradient-to-br from-[#070A13] via-[#0A0D18] to-[#120A1F] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
 
         {/* Logo + title */}
@@ -1106,6 +1108,7 @@ export default function EncounterForm() {
         </p>
 
       </div>
-    </div>
+      </div>
+    </SabbathRegistrationGuard>
   );
 }

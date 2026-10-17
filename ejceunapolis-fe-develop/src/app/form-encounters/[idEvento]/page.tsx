@@ -26,6 +26,7 @@ import {
   X,
 } from "lucide-react";
 import TermoAceiteInscricao from "@/components/term/termo-aceite-inscricao";
+import SabbathRegistrationGuard from "@/components/sabbath/sabbath-registration-guard";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 interface FormData {
@@ -305,7 +306,8 @@ export default function EncountersForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#070A13] via-[#0A0D18] to-[#120A1F] flex items-center justify-center p-4">
+    <SabbathRegistrationGuard>
+      <div className="min-h-screen bg-gradient-to-br from-[#070A13] via-[#0A0D18] to-[#120A1F] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
@@ -934,7 +936,8 @@ export default function EncountersForm() {
           EJC Eunápolis · Seus dados estão protegidos
         </p>
       </div>
-    </div>
+      </div>
+    </SabbathRegistrationGuard>
   );
 }
 
