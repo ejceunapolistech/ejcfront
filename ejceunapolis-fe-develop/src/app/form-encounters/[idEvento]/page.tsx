@@ -57,7 +57,7 @@ interface FormData {
 }
 
 const STEPS = [
-  { id: 1, label: "Dados Pessoais", icon: User },
+  { id: 1, label: "Encontrista", icon: User },
   { id: 2, label: "Endereço", icon: MapPin },
   { id: 3, label: "Saúde", icon: HeartPulse },
   { id: 4, label: "Padrinho", icon: Users },
@@ -318,7 +318,7 @@ export default function EncountersForm() {
             Inscrição de Encontrista
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Preencha os dados para confirmar sua participação
+            Padrinho, preencha os dados do encontrista para realizar a inscrição
           </p>
         </div>
 
@@ -362,11 +362,11 @@ export default function EncountersForm() {
 
         {/* Card do formulário */}
         <div className="rounded-2xl border border-white/10 bg-[#101522]/80 shadow-xl shadow-black/30 p-6 sm:p-8">
-          {/* Step 1 — Dados Pessoais */}
+          {/* Step 1 — Dados do Encontrista */}
           {step === 1 && (
             <div className="space-y-5">
               <h2 className="text-lg font-semibold text-slate-50 mb-4">
-                Dados Pessoais
+                Dados do Encontrista
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
@@ -374,7 +374,7 @@ export default function EncountersForm() {
                     <Input
                       value={formData.nomeCompleto}
                       onChange={(e) => set("nomeCompleto", e.target.value)}
-                      placeholder="Seu nome completo"
+                      placeholder="Nome completo do encontrista"
                     />
                   </FormField>
                 </div>
@@ -399,7 +399,7 @@ export default function EncountersForm() {
                     type="email"
                     value={formData.emailEncontrista}
                     onChange={(e) => set("emailEncontrista", e.target.value)}
-                    placeholder="seu@email.com"
+                    placeholder="email@exemplo.com"
                   />
                 </FormField>
                 <FormField label="WhatsApp" required>
@@ -415,21 +415,21 @@ export default function EncountersForm() {
                   <Input
                     value={formData.instagram}
                     onChange={(e) => set("instagram", e.target.value)}
-                    placeholder="@seuperfil"
+                    placeholder="@perfil_do_encontrista"
                   />
                 </FormField>
                 <FormField label="Nome do pai" required>
                   <Input
                     value={formData.nomePai}
                     onChange={(e) => set("nomePai", e.target.value)}
-                    placeholder="Nome do seu pai"
+                    placeholder="Nome do pai do encontrista"
                   />
                 </FormField>
                 <FormField label="Nome da mãe" required>
                   <Input
                     value={formData.nomeMae}
                     onChange={(e) => set("nomeMae", e.target.value)}
-                    placeholder="Nome da sua mãe"
+                    placeholder="Nome da mãe do encontrista"
                   />
                 </FormField>
                 <div className="sm:col-span-2">
@@ -736,7 +736,7 @@ export default function EncountersForm() {
               </h2>
 
               <div className="space-y-3">
-                <ReviewSection title="Dados Pessoais">
+                <ReviewSection title="Dados do Encontrista">
                   <ReviewRow label="Nome" value={formData.nomeCompleto} />
                   <ReviewRow
                     label="Preferido"
